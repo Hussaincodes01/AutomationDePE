@@ -1,0 +1,14 @@
+# Environments
+.env
+
+# Databases
+*.db
+*.sqlite3
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Data 
+*.csv
+prospects_template.csv
