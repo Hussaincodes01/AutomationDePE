@@ -253,14 +253,14 @@ def run_email_only():
 
 
 def run_scheduled():
-    """Run full autopilot every 5 hours."""
+    """Run full autopilot every 2 hours."""
     import schedule
     
-    print("[CLOCK] SCHEDULING: Full autopilot every 5 hours")
+    print("[CLOCK] SCHEDULING: Full autopilot every 2 hours")
     print("   Press Ctrl+C to stop.\n")
     
     run_full_autopilot()
-    schedule.every(5).hours.do(run_full_autopilot)
+    schedule.every(2).hours.do(run_full_autopilot)
     
     while True:
         schedule.run_pending()
