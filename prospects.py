@@ -247,55 +247,51 @@ def scrape_pe_directories():
 
 
 # ===========================================================
-# SOURCE 2B: High-Volume Global VC Scraping (Google Dorks)
+# SOURCE 2B: High-Volume Global VC Mega-List
 # ===========================================================
 def scrape_massive_vc_lists():
-    """Dynamically discover hundreds of VC/PE firms worldwide using Crunchbase Dorks."""
-    print("\n[FIRM] Executing High-Volume Crunchbase VC Indexing...")
+    """Injects a massive volume of VC/PE firms to feed the email processor."""
+    print("\n[FIRM] Executing High-Volume VC Indexing...")
     
-    found = 0
-    # Search Google for Crunchbase profiles of venture firms
-    queries = [
-        'site:crunchbase.com/organization "venture capital"',
-        'site:crunchbase.com/organization "private equity" "investments"',
-        'site:crunchbase.com/organization "Seed stage" "venture"',
-        'site:crunchbase.com/organization "Series A" "lead investor"'
+    # We bypass Google Dorks for firm names to avoid 429 Too Many Requests IP blocks.
+    mega_list = [
+        "SoftBank Vision Fund", "Founders Fund", "First Round Capital", "Y Combinator",
+        "500 Startups", "Greycroft", "Point9 Capital", "LocalGlobe", "Felix Capital",
+        "Hoxton Ventures", "Dawn Capital", "Balderton Capital", "Atomico", "Index Ventures",
+        "Seabed VC", "Cherry Ventures", "Speedinvest", "Creandum", "Northzone",
+        "EQT Ventures", "Project A Ventures", "Earlybird Venture Capital", "Lakestar",
+        "HV Capital", "Target Global", "Global Founders Capital", "Seedcamp",
+        "Entrepreneur First", "BGF (Business Growth Fund)", "Octopus Ventures",
+        "Beringea", "Molten Ventures", "Amadeus Capital Partners", "Cambridge Innovation Capital",
+        "Oxford Sciences Innovation", "Parkwalk Advisors", "Mercia Asset Management",
+        "Foresight Group", "Calculus Capital", "Puma Investments", "Mobeus Equity Partners",
+        "Seneca Partners", "Deepbridge Capital", "Symvan Capital", "Guinness Asset Management",
+        "Tribe Capital", "Khosla Ventures", "True Ventures", "Floodgate",
+        "Harrison Metal", "Baseline Ventures", "FirstMark Capital", "RRE Ventures",
+        "Lerer Hippeau", "BoxGroup", "Primary Venture Partners", "Bowery Capital",
+        "Bessemer Venture Partners", "Insight Partners", "General Atlantic", "Warburg Pincus",
+        "TPG Capital", "Apollo Global Management", "Carlyle Group", "KKR",
+        "Bain Capital", "Oaktree Capital Management", "Ares Management", "Silver Lake",
+        "Thoma Bravo", "Vista Equity Partners", "Hellman & Friedman", "CVC Capital Partners",
+        "EQT Partners", "Permira", "Apax Partners", "Cinven", "Charterhouse Capital Partners",
+        "BC Partners", "PAI Partners", "Bridgepoint", "Montagu Private Equity",
+        "Inflexion Private Equity", "Livingbridge", "ECI Partners", "LDC (Lloyds Development Capital)",
+        "BGF (Business Growth Fund)", "Palatine Private Equity", "NorthEdge Capital",
+        "Equistone Partners Europe", "Gresham House", "Foresight Group", "NVM Private Equity"
     ]
     
-    for query in queries:
-        for page in range(0, 30, 10): # Scrape multiple Google pages per query
-            url = f"https://www.google.com/search?q={requests.utils.quote(query)}&start={page}"
-            resp = _polite_get(url)
-            if not resp:
-                continue
-                
-            soup = BeautifulSoup(resp.text, "html.parser")
-            for g in soup.find_all('div', class_='g'):
-                title_elem = g.find('h3')
-                if title_elem:
-                    # e.g., "Andreessen Horowitz - Crunchbase Investor Profile" -> "Andreessen Horowitz"
-                    raw_title = title_elem.text
-                    firm_name = raw_title.split("-")[0].split("|")[0].replace("Crunchbase", "").replace("Investor Profile", "").replace("Company Profile", "").strip()
-                    
-                    if len(firm_name) > 3 and "http" not in firm_name:
-                        # Only save the name. Website will trigger Google Email Dorking later.
-                        was_new = save_prospect(
-                            firm_name=firm_name,
-                            email="",
-                            website="", # Blank website forces the LinkedIn/Twitter Email Dork directly!
-                            source="Crunchbase_Dorks"
-                        )
-                        if was_new:
-                            found += 1
+    found = 0
+    for firm_name in mega_list:
+        was_new = save_prospect(
+            firm_name=firm_name,
+            email="",
+            website="", # Blank website forces the LinkedIn/Twitter Email Dork directly
+            source="Mega_List"
+        )
+        if was_new:
+            found += 1
             
-            time.sleep(1) # Polite delay for Google pages
-            
-            if found >= 150: # Cap it per run to avoid flooding the DB instantly
-                break
-        if found >= 150:
-            break
-            
-    print(f"   [OK] Indexed {found} NEW global PE/VC firms via Web-Graph")
+    print(f"   [OK] Indexed {found} NEW global PE/VC firms instantly")
     return found
 
 
